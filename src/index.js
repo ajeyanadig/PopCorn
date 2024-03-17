@@ -3,11 +3,19 @@ import ReactDOM from "react-dom/client";
 import StarRating from "./StarRating";
 // import "./index.css";
 // import App from "./App";
-
+// const messages = ["Terrible", "Meh", "Okay", "Pretty Good", "Must Watch !"];
+function justPrintTheVal(val) {
+  //access the internal state by passing in a handler, here imma just pass a function
+  console.log(val);
+}
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     {/* <App /> */}
-    <StarRating maxRating={10} defaultRating={3} />
+
+    <StarRating
+      // messages={messages}
+      onSetRating={justPrintTheVal}
+    />
   </React.StrictMode>
 );
