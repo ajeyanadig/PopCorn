@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-
 import { NavBar, SearchBar, NumResults, Logo } from "./Navigation/NavBar";
 import { Main } from "./Main";
 import { MoviesList } from "./MoviesBox/MovieListBox";
 import { WatchedSummary, WatchMovieList } from "./WatchedBox/WatchedBox";
 import { MovieDetails } from "./WatchedBox/MovieDetails";
 import { Box } from "./Box";
+
 const key = "2b437c3f";
 // SEARCH QUERY `http://www.omdbapi.com/?s=${'Avengers'}`
 
@@ -19,32 +19,33 @@ export default function App() {
 
   useEffect(
     function () {
+      const controller = new AbortController();
       async function fetchMovies() {
         try {
           setIsLoading(true);
           setError(false);
 
           const response = await fetch(
-            `http://www.omdbapi.com/?s=${query}&apikey=${key}`
+            `http://www.omdbapi.com/?s=${query}&apikey=${key}`,
+            { signal: controller.signal }
           );
           if (!response.ok) {
             console.log(response);
             throw new Error("⛔️ Something Went Wrong");
           }
           const res = await response.json();
-
           console.log(res);
 
           if (res.Response === "False") {
             setMovies([]);
-            if (res.Error === "Too many results.") {
+            if (res.Error === "Too many results.")
               throw new Error("A little more accurate please");
-            }
             throw new Error("⛔️ Movie not found");
           }
           setMovies(res.Search);
+          setError(false);
         } catch (e) {
-          setError(e.message);
+          if (e.name !== "AbortError") setError(e.message);
         } finally {
           setIsLoading(false);
         }
@@ -54,13 +55,20 @@ export default function App() {
         return;
       }
       fetchMovies();
+      return function () {
+        controller.abort();
+      };
     },
     [query]
   );
-  function onSelectMovie(id) {
+
+  function handleSelectMovie(id) {
     setSelectedID(id);
   }
-  function onCloseSelectedMovie() {
+  function handleAddWatched(movie) {
+    setWatched((watched) => [...watched, movie]);
+  }
+  function handleCloseMovie() {
     setSelectedID("");
   }
   function handleDeleteWatched(id) {
@@ -78,7 +86,7 @@ export default function App() {
         <Box>
           {isLoading && <Loader />}
           {!isLoading && !error && (
-            <MoviesList movies={movies} onSelect={onSelectMovie} />
+            <MoviesList movies={movies} onSelect={handleSelectMovie} />
           )}
           {error && <ErrorMessage msg={error} />}
         </Box>
@@ -88,16 +96,16 @@ export default function App() {
           {selectedID ? (
             <MovieDetails
               selectedID={selectedID}
-              onBack={onCloseSelectedMovie}
+              onAddWatched={handleAddWatched}
+              onCloseMovie={handleCloseMovie}
               watched={watched}
-              setWatched={setWatched}
             />
           ) : (
             <>
               <WatchedSummary watched={watched} />
               <WatchMovieList
                 watched={watched}
-                onDelete={handleDeleteWatched}
+                onDeleteWatched={handleDeleteWatched}
               />
             </>
           )}

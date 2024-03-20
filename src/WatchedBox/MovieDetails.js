@@ -43,9 +43,14 @@ const key = "2b437c3f";
 //   Website: "N/A",
 //   Response: "True",
 // };
-export function MovieDetails({ selectedID, onBack, watched, setWatched }) {
+export function MovieDetails({
+  selectedID,
+  onCloseMovie,
+  onAddWatched,
+  watched,
+}) {
   const [movie, setMovie] = useState("");
-  const [rating, setRating] = useState(0);
+  const [userRating, setUserRating] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const foundMovie = watched.find((curr) => curr.imdbID === selectedID);
   const isWatched = Boolean(foundMovie);
@@ -65,7 +70,7 @@ export function MovieDetails({ selectedID, onBack, watched, setWatched }) {
 
   useEffect(
     function () {
-      async function fetchMovieDetails() {
+      async function getMovieDetails() {
         setIsLoading(true);
         const response = await fetch(
           `http://www.omdbapi.com/?i=${selectedID}&apikey=${key}`
@@ -74,12 +79,34 @@ export function MovieDetails({ selectedID, onBack, watched, setWatched }) {
         setMovie(data);
         setIsLoading(false);
       }
-      fetchMovieDetails();
+      getMovieDetails();
     },
     [selectedID]
   );
+  useEffect(
+    function () {
+      if (!title) return;
+      document.title = `Movie | ${title}`;
+      return function () {
+        document.title = `Use Popcorn`;
+      };
+    },
+    [title]
+  );
+  useEffect(
+    function () {
+      function callback(e) {
+        if (e.code === "Escape") onCloseMovie();
+      }
+      document.addEventListener("keyup", callback);
+      return function () {
+        document.removeEventListener("keyup", callback);
+      };
+    },
+    [onCloseMovie]
+  );
 
-  function handleAddMovie() {
+  function handleAdd() {
     const newMovie = {
       imdbID,
       title,
@@ -88,10 +115,10 @@ export function MovieDetails({ selectedID, onBack, watched, setWatched }) {
       released,
       genre,
       imdbRating,
-      userRating: rating,
+      userRating,
     };
-    setWatched((val) => [...val, newMovie]);
-    onBack();
+    onAddWatched(newMovie);
+    onCloseMovie();
   }
 
   return (
@@ -100,7 +127,7 @@ export function MovieDetails({ selectedID, onBack, watched, setWatched }) {
       {!isLoading && (
         <div className="details">
           <header>
-            <button className="btn-back" onClick={onBack}>
+            <button className="btn-back" onClick={onCloseMovie}>
               {"<-"}
             </button>
 
@@ -131,10 +158,10 @@ export function MovieDetails({ selectedID, onBack, watched, setWatched }) {
                     maxRating={10}
                     size={24}
                     color="#FFD700"
-                    onSetRating={setRating}
+                    onSetRating={setUserRating}
                   />
-                  {rating > 0 && (
-                    <button className="btn-add" onClick={handleAddMovie}>
+                  {userRating > 0 && (
+                    <button className="btn-add" onClick={handleAdd}>
                       Add To List
                     </button>
                   )}
