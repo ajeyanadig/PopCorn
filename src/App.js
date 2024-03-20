@@ -7,7 +7,6 @@ import { MovieDetails } from "./WatchedBox/MovieDetails";
 import { Box } from "./Box";
 
 const key = "2b437c3f";
-// SEARCH QUERY `http://www.omdbapi.com/?s=${'Avengers'}`
 
 export default function App() {
   const [query, setQuery] = useState("");
