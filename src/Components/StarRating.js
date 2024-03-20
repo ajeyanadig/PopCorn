@@ -3,7 +3,7 @@ import { useState } from "react";
 function StarRating({
   maxRating = 5,
   defaultRating = 0,
-  color = "#0000ff",
+  color = "#ffffff",
   size = 30,
   onSetRating,
   messages = [],
@@ -24,13 +24,15 @@ function StarRating({
   }
   const containerStyle = {
     display: "flex",
-    gap: "10px",
+    gap: "5px",
     alignItems: "center",
   };
   const starContainerStyle = {
     display: "flex",
+    width: "100%",
     gap: "4px",
     minHeight: "20px",
+    justifyContent: "space-evenly",
   };
   const textStyle = {
     lineHeight: "1",
