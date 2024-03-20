@@ -43,10 +43,12 @@ const key = "2b437c3f";
 //   Website: "N/A",
 //   Response: "True",
 // };
-export function MovieDetails({ selectedID, onBack }) {
+export function MovieDetails({ selectedID, onBack, watched, setWatched }) {
   const [movie, setMovie] = useState("");
   const [rating, setRating] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const foundMovie = watched.find((curr) => curr.imdbID === selectedID);
+  const isWatched = Boolean(foundMovie);
   const {
     Title: title,
     // Year: year,
@@ -58,7 +60,9 @@ export function MovieDetails({ selectedID, onBack }) {
     Released: released,
     Genre: genre,
     imdbRating,
+    imdbID,
   } = movie;
+
   useEffect(
     function () {
       async function fetchMovieDetails() {
@@ -75,6 +79,21 @@ export function MovieDetails({ selectedID, onBack }) {
     [selectedID]
   );
 
+  function handleAddMovie() {
+    const newMovie = {
+      imdbID,
+      title,
+      poster,
+      runtime: Number(runtime.split(" ")[0]),
+      released,
+      genre,
+      imdbRating,
+      userRating: rating,
+    };
+    setWatched((val) => [...val, newMovie]);
+    onBack();
+  }
+
   return (
     <>
       {isLoading && <Loader />}
@@ -84,8 +103,9 @@ export function MovieDetails({ selectedID, onBack }) {
             <button className="btn-back" onClick={onBack}>
               {"<-"}
             </button>
-            <br />
+
             <img src={poster} alt={`Poster of ${title}`} />
+
             <div className="details-overview">
               <h2>{title}</h2>
               <p>
@@ -98,15 +118,29 @@ export function MovieDetails({ selectedID, onBack }) {
               </p>
             </div>
           </header>
+
           <section>
-            <div className="rating">
-              <StarRating
-                maxRating={10}
-                size={24}
-                color="#FFD700"
-                onSetRating={setRating}
-              ></StarRating>
-            </div>
+            {isWatched ? (
+              <p className="rating">
+                You gave this movie of {foundMovie.userRating} ⭐️ already !
+              </p>
+            ) : (
+              <>
+                <div className="rating">
+                  <StarRating
+                    maxRating={10}
+                    size={24}
+                    color="#FFD700"
+                    onSetRating={setRating}
+                  />
+                  {rating > 0 && (
+                    <button className="btn-add" onClick={handleAddMovie}>
+                      Add To List
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
             <em>{plot}</em>
             <p>
               <strong>Starring : </strong> {actors}
