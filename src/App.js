@@ -5,8 +5,8 @@ import { MoviesList } from "./MoviesBox/MovieListBox";
 import { WatchedSummary, WatchMovieList } from "./WatchedBox/WatchedBox";
 import { MovieDetails } from "./WatchedBox/MovieDetails";
 import { Box } from "./Box";
-import { useMovie } from "./useMovie";
-import { useLocalStorageState } from "./useLocalStorageState";
+import { useMovie } from "./CustomHooks/useMovie";
+import { useLocalStorageState } from "./CustomHooks/useLocalStorageState";
 
 export default function App() {
   const [query, setQuery] = useState("");

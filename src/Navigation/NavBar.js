@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useKey } from "../useKey";
+import { useKey } from "../CustomHooks/useKey";
 export function NavBar({ children }) {
   return <nav className="nav-bar">{children}</nav>;
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import StarRating from "../Components/StarRating";
-import { useKey } from "../useKey";
+import { useKey } from "../CustomHooks/useKey";
 
 const key = "2b437c3f";
 // let x = {
