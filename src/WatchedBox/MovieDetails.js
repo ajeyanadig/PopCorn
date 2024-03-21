@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import StarRating from "../Components/StarRating";
+import { useKey } from "../useKey";
 
 const key = "2b437c3f";
 // let x = {
@@ -93,19 +94,7 @@ export function MovieDetails({
     },
     [title]
   );
-  useEffect(
-    function () {
-      function callback(e) {
-        if (e.code === "Escape") onCloseMovie();
-      }
-      document.addEventListener("keyup", callback);
-      return function () {
-        document.removeEventListener("keyup", callback);
-      };
-    },
-    [onCloseMovie]
-  );
-
+  useKey("Escape", onCloseMovie);
   function handleAdd() {
     const newMovie = {
       imdbID,

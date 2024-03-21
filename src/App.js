@@ -1,65 +1,18 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { NavBar, SearchBar, NumResults, Logo } from "./Navigation/NavBar";
 import { Main } from "./Main";
 import { MoviesList } from "./MoviesBox/MovieListBox";
 import { WatchedSummary, WatchMovieList } from "./WatchedBox/WatchedBox";
 import { MovieDetails } from "./WatchedBox/MovieDetails";
 import { Box } from "./Box";
-
-const key = "2b437c3f";
+import { useMovie } from "./useMovie";
+import { useLocalStorageState } from "./useLocalStorageState";
 
 export default function App() {
   const [query, setQuery] = useState("");
-  const [watched, setWatched] = useState([]);
-  const [movies, setMovies] = useState([]);
+  const [watched, setWatched] = useLocalStorageState([], "watched");
+  const { movies, isLoading, error } = useMovie(query);
   const [selectedID, setSelectedID] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(false);
-
-  useEffect(
-    function () {
-      const controller = new AbortController();
-      async function fetchMovies() {
-        try {
-          setIsLoading(true);
-          setError(false);
-
-          const response = await fetch(
-            `https://www.omdbapi.com/?s=${query}&apikey=${key}`,
-            { signal: controller.signal }
-          );
-          if (!response.ok) {
-            console.log(response);
-            throw new Error("⛔️ Something Went Wrong");
-          }
-          const res = await response.json();
-          console.log(res);
-
-          if (res.Response === "False") {
-            setMovies([]);
-            if (res.Error === "Too many results.")
-              throw new Error("A little more accurate please");
-            throw new Error("⛔️ Movie not found");
-          }
-          setMovies(res.Search);
-          setError(false);
-        } catch (e) {
-          if (e.name !== "AbortError") setError(e.message);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-      if (query.length < 3) {
-        setMovies([]);
-        return;
-      }
-      fetchMovies();
-      return function () {
-        controller.abort();
-      };
-    },
-    [query]
-  );
 
   function handleSelectMovie(id) {
     setSelectedID(id);
